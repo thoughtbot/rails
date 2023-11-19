@@ -166,6 +166,11 @@
   name: Digging Deeper
   documents:
     -
+      name: Building Accessible Rails Applications
+      work_in_progress: true
+      url: accessibility.html
+      description: This guide covers techniques used create experiences that are accessible to all users.
+    -
       name: Rails Internationalization (I18n) API
       url: i18n.html
       description: This guide covers how to add internationalization to your applications. Your application will be able to translate content to different languages, change pluralization rules, use correct date formats for each country, and so on.
