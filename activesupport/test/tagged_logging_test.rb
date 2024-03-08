@@ -26,8 +26,21 @@ class TaggedLoggingTest < ActiveSupport::TestCase
   end
 
   test "tagged once" do
-    @logger.tagged("BCX") { @logger.info "Funky time" }
-    assert_equal "[BCX] Funky time\n", @output.string
+    assert_logged "[BCX] Funky time\n", logger: @logger do |logger|
+      logger.tagged("BCX") { logger.info "Funky time" }
+      # logger.info "Funky time"
+    end
+  end
+
+  def assert_logged(string, logger: Rails.logger)
+    assertion_output = StringIO.new
+    assertion_logger = MyLogger.new(assertion_output)
+    binding.irb
+    broadcast_logger = ActiveSupport::BroadcastLogger.new(logger, assertion_logger)
+
+    yield broadcast_logger
+
+    assert_equal string, assertion_output.string
   end
 
   test "tagged twice" do
