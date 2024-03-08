@@ -261,6 +261,46 @@ module ActiveSupport
         retval
       end
 
+      def assert_logged(expected_value, logger, &block)
+        captured = capture_logs(logger, &block)
+
+        case expected_value
+        when Regexp
+          assert_match expected_value, captured
+        else
+          assert_equal expected_value, captured
+        end
+      end
+
+      def assert_not_logged(expected_value = nil, logger = nil, &block)
+        if expected_value.respond_to?(:info)
+          logger, expected_value = expected_value, nil
+        end
+
+        captured = capture_logs(logger, &block)
+
+        case expected_value
+        when NilClass
+          assert_empty captured, "expected no logs, but was #{captured.inspect}"
+        when Regexp
+          refute_match expected_value, captured
+        else
+          assert_not_equal expected_value, captured
+        end
+      end
+
+      def capture_logs(logger)
+        output = StringIO.new
+        logdev = logger.instance_variable_get(:@logdev)
+        logger.reopen output
+
+        yield
+
+        output.string
+      ensure
+        logger.reopen logdev
+      end
+
       private
         def _assert_nothing_raised_or_warn(assertion, &block)
           assert_nothing_raised(&block)
